@@ -1,0 +1,48 @@
+name: Deploy CDK stack
+description: Deploys a Python CDK Stack to Target Account and Region
+
+inputs:
+  cdk_version:
+    required: true
+  folder:
+    required: true
+  aws_account:
+    required: true 
+  aws_region:
+    required: true
+  iam_role:
+    required: true
+
+permissions:
+      id-token: write
+      contents: read
+
+runs:
+  using: composite
+  steps:
+  - name: Configure AWS Credentials
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      role-to-assume: ${{inputs.iam_role}}
+      aws-region: ${{inputs.aws_region}}
+      role-skip-session-tagging: true
+      role-duration-seconds: 1200
+
+  - uses: actions/setup-python@v4
+    with:
+      python-version: 3.9
+
+  - name: Install dependencies
+    run: |
+      npm install -g aws-cdk@{{inputs.cdk_version}}
+      pip3 install --upgrade pip \
+        pyyaml \
+        constructs \
+        sagemaker \
+        aws-cdk-lib=={{inputs.cdk_version}}
+
+  - name: Deploy CDK stack
+    run: |
+      cd ${{inputs.folder}}
+      cdk bootstrap aws://${{inputs.aws_account}}/${{inputs.aws_region}}
+      cdk deploy --require-approval never

@@ -33,6 +33,7 @@ runs:
       python-version: 3.9
 
   - name: Install dependencies
+    shell: bash
     run: |
       npm install -g aws-cdk@${{inputs.cdk_version}}
       pip3 install --upgrade pip \

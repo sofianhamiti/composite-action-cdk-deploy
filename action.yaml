@@ -25,8 +25,8 @@ runs:
     with:
       role-to-assume: ${{inputs.iam_role}}
       aws-region: ${{inputs.aws_region}}
-      role-skip-session-tagging: true
-      role-duration-seconds: 1200
+#       role-skip-session-tagging: true
+#       role-duration-seconds: 1200
 
   - uses: actions/setup-python@v4
     with:
@@ -42,6 +42,7 @@ runs:
         aws-cdk-lib==${{inputs.cdk_version}}
 
   - name: Deploy CDK stack
+    shell: bash
     run: |
       cd ${{inputs.folder}}
       cdk bootstrap aws://${{inputs.aws_account}}/${{inputs.aws_region}}
